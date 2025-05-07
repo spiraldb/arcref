@@ -1,3 +1,52 @@
+//! `ArcRef<T>` is a smart pointer type that can hold either a `&'static T` or an `Arc<T>`.
+//!
+//! It's especially helpful for composible plugin systems where some of the implementations are
+//! ZSTs or packaged with the core library, and the others are dynamically generated.
+//!
+//! ## Example usage:
+//!
+//! ```rust
+//! use arcref::ArcRef;
+//! use std::sync::Arc;
+//!
+//! #[derive(Debug, Copy, Clone, PartialOrd, PartialEq)]
+//! pub enum Level { INFO, WARN, ERROR }
+//!
+//! pub trait Logger {
+//!   fn log(&self, level: Level, line: &str) -> String;
+//! }
+//!
+//! pub struct ConsoleLogger;
+//!
+//! impl Logger for ConsoleLogger {
+//!   fn log(&self, level: Level, line: &str) -> String {
+//!     format!("{level:?}: {line}")
+//!   }
+//! }
+//!
+//! pub struct FilteredLogger {
+//!   min_level: Level,
+//!   delegate: ArcRef<dyn Logger>,
+//! }
+//!
+//! impl Logger for FilteredLogger {
+//!   fn log(&self, level: Level, line: &str) -> String {
+//!     if level >= self.min_level {
+//!       self.delegate.log(level, line)
+//!     } else {
+//!       String::new()
+//!     }
+//!   }
+//! }
+//!
+//! let logger = ArcRef::new_arc(Arc::new(FilteredLogger {
+//!   min_level: Level::WARN,
+//!   delegate: ArcRef::new_ref(&ConsoleLogger),
+//! }));
+//!
+//! assert_eq!(logger.log(Level::INFO, "not printed"), String::new());
+//! assert_eq!(logger.log(Level::WARN, "printed"), "WARN: printed");
+//! ```
 use std::cmp::Ordering;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
