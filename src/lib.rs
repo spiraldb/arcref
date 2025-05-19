@@ -47,12 +47,22 @@
 //! assert_eq!(logger.log(Level::INFO, "not printed"), String::new());
 //! assert_eq!(logger.log(Level::WARN, "printed"), "WARN: printed");
 //! ```
+#![cfg_attr(not(feature = "std"), no_std)]
+
+extern crate alloc;
+
+use alloc::sync::Arc;
+
+#[cfg(feature = "std")]
 use std::borrow::Borrow;
+#[cfg(feature = "std")]
 use std::cmp::Ordering;
+#[cfg(feature = "std")]
 use std::fmt::{Debug, Display};
+#[cfg(feature = "std")]
 use std::hash::Hash;
+#[cfg(feature = "std")]
 use std::ops::Deref;
-use std::sync::Arc;
 
 /// Either a reference-counted `Arc` or a static reference to a value.
 pub struct ArcRef<T: ?Sized + 'static>(Inner<T>);
@@ -102,6 +112,7 @@ impl<T: ?Sized + 'static> From<Arc<T>> for ArcRef<T> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<T: ?Sized> Deref for ArcRef<T> {
     type Target = T;
 
@@ -113,6 +124,7 @@ impl<T: ?Sized> Deref for ArcRef<T> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<S, T> PartialEq<ArcRef<S>> for ArcRef<T>
 where
     S: ?Sized + 'static,
@@ -123,8 +135,10 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T> Eq for ArcRef<T> where T: ?Sized + 'static + Eq {}
 
+#[cfg(feature = "std")]
 impl<S, T> PartialOrd<ArcRef<S>> for ArcRef<T>
 where
     S: ?Sized + 'static,
@@ -135,6 +149,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T> Ord for ArcRef<T>
 where
     T: ?Sized + 'static + Ord,
@@ -144,6 +159,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T> Hash for ArcRef<T>
 where
     T: ?Sized + 'static + Hash,
@@ -153,6 +169,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T> Debug for ArcRef<T>
 where
     T: ?Sized + 'static + Debug,
@@ -162,6 +179,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T> Display for ArcRef<T>
 where
     T: ?Sized + 'static + Display,
@@ -171,12 +189,14 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl<T: ?Sized + 'static> AsRef<T> for ArcRef<T> {
     fn as_ref(&self) -> &T {
         self
     }
 }
 
+#[cfg(feature = "std")]
 impl<T: ?Sized + 'static> Borrow<T> for ArcRef<T> {
     fn borrow(&self) -> &T {
         self
