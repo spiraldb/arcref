@@ -47,6 +47,7 @@
 //! assert_eq!(logger.log(Level::INFO, "not printed"), String::new());
 //! assert_eq!(logger.log(Level::WARN, "printed"), "WARN: printed");
 //! ```
+use std::borrow::Borrow;
 use std::cmp::Ordering;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
@@ -172,6 +173,12 @@ where
 
 impl<T: ?Sized + 'static> AsRef<T> for ArcRef<T> {
     fn as_ref(&self) -> &T {
+        self
+    }
+}
+
+impl<T: ?Sized + 'static> Borrow<T> for ArcRef<T> {
+    fn borrow(&self) -> &T {
         self
     }
 }
