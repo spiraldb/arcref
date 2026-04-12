@@ -9,3 +9,7 @@ documentation = "https://docs.rs/arcref"
 description = "For when you need a pointer and don't care if it's &'static T or Arc<T>"
 keywords = ["arc", "arcref", "static", "pointer"]
 readme = "README.md"
+
+[features]
+default = ["std"]
+std = []
