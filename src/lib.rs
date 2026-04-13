@@ -120,21 +120,8 @@ where
     T: ?Sized + 'static + PartialEq<S>,
 {
     fn eq(&self, other: &ArcRef<S>) -> bool {
-        let ptr_eq = match (self, other) {
-            (ArcRef(Inner::Arc(a)), ArcRef(Inner::Arc(b))) => {
-                ptr::addr_eq(Arc::as_ptr(a), Arc::as_ptr(b))
-            }
-            (ArcRef(Inner::Arc(a)), ArcRef(Inner::Ref(b))) => {
-                ptr::addr_eq(Arc::as_ptr(a), ptr::from_ref(*b))
-            }
-            (ArcRef(Inner::Ref(a)), ArcRef(Inner::Ref(b))) => {
-                ptr::addr_eq(ptr::from_ref(*a), ptr::from_ref(*b))
-            }
-            (ArcRef(Inner::Ref(a)), ArcRef(Inner::Arc(b))) => {
-                ptr::addr_eq(ptr::from_ref(*a), Arc::as_ptr(b))
-            }
-        };
-        ptr_eq || self.deref() == other.deref()
+        ptr::addr_eq(ptr::from_ref(self.deref()), ptr::from_ref(other.deref()))
+            || self.deref() == other.deref()
     }
 }
 
